@@ -4,6 +4,8 @@
   // config
   $domain = 'welchezukunft.org';
   $ml_name = 'test';
+  $log_dir = '/var/newsletter';
+  $log_file = $log_dir.'/'.$ml_name;
   $err_sub_mail_missing = 'Bitte geben Sie eine Email-Adresse an.';
   $ok_sent_data_success = 'Daten erfolgreich übermittelt.' . "\r\n" .
     'Bitte bestätigen Sie die Email, welche Sie in Kürze von uns erhalten.';
@@ -18,9 +20,10 @@
   //// given via POST
   $sub_mail = $name_first = $name_last = "";
   //// used in form
-  $feedback = "";
+  $feedback = $result_display = "";
   //// used only here
   $mail_address = $mail_subject = $mail_msg = $return_value = "";
+  $return_value_log = "";
 
   // functions
 
@@ -64,8 +67,10 @@
       $adr = $ml_name.'-subscribe-'.$sub_mail_ezmlm;
       $subj = "";
       $msg = "";
+      $sub_log = $sub_mail . " \"" . $name_first . " " . $name_last ."\"\r\n";
       $return_value = _mail($adr, $subj, $msg);
-      if ($return_value == TRUE) {
+      $return_value_log = file_put_contents($log_file, $sub_log, FILE_APPEND | LOCK_EX);
+      if ($return_value == TRUE && $return_value_log != FALSE) {
         $feedback = $ok_sent_data_success;
       } else {
         $feedback = $err_sent_data_failed;
@@ -73,11 +78,16 @@
     } else {
       $feedback = $err_sub_mail_missing;
     }
+    if (empty($feedback)) {
+      $result_display = 'display:none;';
+    } else {
+      $result_display = 'display:block;';
+    }
   } else {
     // GET stuff
     // get env
     $unsub_mail = $_GET['unsub'];
- 
+
     // confirmations
     if (!empty($_GET["subject"])) {
       $action = test_input($_GET["action"]);
