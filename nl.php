@@ -85,8 +85,6 @@
     }
   } else {
     // GET stuff
-    // get env
-    $unsub_mail = $_GET['unsub'];
 
     // confirmations
     if (!empty($_GET["subject"])) {
