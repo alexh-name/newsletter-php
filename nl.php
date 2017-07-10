@@ -46,6 +46,7 @@
   //// mail
 
   function _mail($adr, $subj, $msg) {
+    global $domain;
     $return_value = mail($adr.'@'.$domain, $subj, $msg);
     return $return_value;
   }
